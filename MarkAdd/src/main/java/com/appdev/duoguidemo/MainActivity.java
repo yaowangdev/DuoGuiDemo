@@ -42,6 +42,25 @@ public class MainActivity extends AppCompatActivity {
         iv_clear = findViewById(R.id.iv_clear);
         iv_back_step = findViewById(R.id.iv_back_step);
         iv_save = findViewById(R.id.iv_save);
+        rg_mark_choose.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                switch (i){
+                    case 0:
+                        mEditMode=EditMode.POINT;
+                        break;
+                    case 1:
+                        mEditMode=EditMode.POLYLINE;
+
+                        break;
+                    case 2:
+                        mEditMode=EditMode.POLYGON;
+
+                        break;
+                }
+
+            }
+        });
     }
 
     private void addLayer() {
@@ -70,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                     ll_tool_operation.setVisibility(View.VISIBLE);
                     //变换图标
                     setAction(R.id.action_add,R.mipmap.ic_action_cancel);
+                    mEditMode=EditMode.POINT;
                 }else {
                     //关闭图形绘制界面
                     //变换图标
@@ -77,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
                     rg_mark_choose.setVisibility(View.GONE);
                     ll_tool_operation.setVisibility(View.GONE);
                     setAction(R.id.action_add,R.mipmap.ic_action_new);
+                    mEditMode=EditMode.NONE;
                 }
                 return true;
             case R.id.action_search:
