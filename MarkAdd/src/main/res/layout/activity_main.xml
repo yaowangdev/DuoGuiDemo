@@ -25,18 +25,21 @@
         android:visibility="gone"
         >
         <RadioButton
+            android:id="@+id/rb_point"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="true"
+            android:checked="false"
             android:text="点"
             />
         <RadioButton
+            android:id="@+id/rb_line"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="线"
             android:checked="false"
             />
         <RadioButton
+            android:id="@+id/rb_polygon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="面"
@@ -59,6 +62,7 @@
             android:layout_height="30dp"
             android:src="@mipmap/edit_ic_clear"
             android:layout_marginTop="10dp"
+            android:clickable="true"
             />
         <ImageView
             android:id="@+id/iv_back_step"
@@ -66,6 +70,7 @@
             android:layout_height="30dp"
             android:src="@mipmap/edit_ic_back_step"
             android:layout_marginTop="10dp"
+            android:clickable="true"
             />
         <ImageView
             android:id="@+id/iv_save"
@@ -73,6 +78,7 @@
             android:layout_height="30dp"
             android:src="@mipmap/edit_ic_save"
             android:layout_marginTop="10dp"
+            android:clickable="true"
             />
     </LinearLayout>
 

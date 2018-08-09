@@ -1,7 +1,7 @@
 package com.appdev.duoguidemo;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,25 +14,27 @@ import com.esri.android.map.Layer;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private enum EditMode {
-        NONE, POINT, POLYLINE, POLYGON, SAVING
-    }
+
+
     private EditMode mEditMode;
     private Menu mMenuItem;
     private MapView mMapView;
     private RadioGroup rg_mark_choose;
     private LinearLayout ll_tool_operation;
     private ImageView iv_clear,iv_back_step,iv_save;
+    private MapOperationListener mapListener;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mEditMode=EditMode.NONE;
         initView();
         addLayer();
+        initMapListener();
     }
 
     private void initView() {
@@ -42,30 +44,39 @@ public class MainActivity extends AppCompatActivity {
         iv_clear = findViewById(R.id.iv_clear);
         iv_back_step = findViewById(R.id.iv_back_step);
         iv_save = findViewById(R.id.iv_save);
+        iv_clear.setOnClickListener(this);
+        iv_back_step.setOnClickListener(this);
+        iv_save.setOnClickListener(this);
         rg_mark_choose.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
                 switch (i){
                     case 0:
-                        mEditMode=EditMode.POINT;
+                        mapListener.setEditMode(EditMode.POINT);
                         break;
                     case 1:
-                        mEditMode=EditMode.POLYLINE;
-
+                        mapListener.setEditMode(EditMode.POLYLINE);
                         break;
                     case 2:
-                        mEditMode=EditMode.POLYGON;
-
+                        mapListener.setEditMode(EditMode.POLYGON);
                         break;
                 }
 
             }
         });
+        rg_mark_choose.check(R.id.rb_point);
     }
 
     private void addLayer() {
         Layer layer = new ArcGISTiledMapServiceLayer(getResources().getString(R.string.map_url));
         mMapView.addLayer(layer);
+    }
+
+
+    private void initMapListener() {
+        mapListener = new MapOperationListener(this,mMapView);
+        mMapView.setOnTouchListener(mapListener);
+        mapListener.setEditMode(mEditMode);
     }
 
 
@@ -75,6 +86,26 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.menu.actions, menu);
         mMenuItem = menu;
         return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.iv_clear:
+
+                break;
+
+            case R.id.iv_back_step:
+
+                break;
+
+            case R.id.iv_save:
+
+
+                break;
+        }
+
     }
 
 
