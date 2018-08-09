@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">DuoGuiDemo</string>
 
+    <string name="map_url">http://services.arcgisonline.com/ArcGIS/rest/services/Demographics/USA_Average_Household_Size/MapServer</string>
+
 
 </resources>

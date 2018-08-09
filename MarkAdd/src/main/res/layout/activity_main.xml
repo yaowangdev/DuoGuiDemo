@@ -5,20 +5,70 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-
-    <LinearLayout
-        android:id="@+id/ll_mark_choose"
-        android:orientation="vertical"
+    <com.esri.android.map.MapView
+        android:id="@+id/map_view"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        mapoptions.MapType="Streets"
+        mapoptions.ZoomLevel="3"
+        mapoptions.center="21.0, -86.0"
+        />
+
+
+    <RadioGroup
+        android:id="@+id/ll_mark_choose"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"/>
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        >
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="点"
+            />
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="线"
+            />
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="面"
+            />
+    </RadioGroup>
 
     <LinearLayout
         android:id="@+id/ll_tool_operation"
         android:orientation="vertical"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/ll_mark_choose"/>
+        android:layout_marginRight="10dp"
+        android:visibility="gone"
+        >
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@mipmap/edit_ic_clear"
+            android:layout_marginTop="10dp"
+            />
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@mipmap/edit_ic_back_step"
+            android:layout_marginTop="10dp"
+            />
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@mipmap/edit_ic_save"
+            android:layout_marginTop="10dp"
+            />
+    </LinearLayout>
 
 </RelativeLayout>
