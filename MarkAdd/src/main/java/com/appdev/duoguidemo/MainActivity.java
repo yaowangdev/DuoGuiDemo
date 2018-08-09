@@ -5,6 +5,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioGroup;
+
+import com.esri.android.map.Layer;
+import com.esri.android.map.MapView;
+import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -13,12 +21,32 @@ public class MainActivity extends AppCompatActivity {
     }
     private EditMode mEditMode;
     private Menu mMenuItem;
+    private MapView mMapView;
+    private RadioGroup rg_mark_choose;
+    private LinearLayout ll_tool_operation;
+    private ImageView iv_clear,iv_back_step,iv_save;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mEditMode=EditMode.NONE;
+        initView();
+        addLayer();
+    }
+
+    private void initView() {
+        mMapView = findViewById(R.id.map_view);
+        rg_mark_choose = findViewById(R.id.rg_mark_choose);
+        ll_tool_operation = findViewById(R.id.ll_tool_operation);
+        iv_clear = findViewById(R.id.iv_clear);
+        iv_back_step = findViewById(R.id.iv_back_step);
+        iv_save = findViewById(R.id.iv_save);
+    }
+
+    private void addLayer() {
+        Layer layer = new ArcGISTiledMapServiceLayer(getResources().getString(R.string.map_url));
+        mMapView.addLayer(layer);
     }
 
 
@@ -38,13 +66,16 @@ public class MainActivity extends AppCompatActivity {
                 if(mEditMode==EditMode.NONE || mEditMode==EditMode.SAVING){
                     //开启图形绘制界面
                     //添加界面
-
+                    rg_mark_choose.setVisibility(View.VISIBLE);
+                    ll_tool_operation.setVisibility(View.VISIBLE);
                     //变换图标
                     setAction(R.id.action_add,R.mipmap.ic_action_cancel);
                 }else {
                     //关闭图形绘制界面
                     //变换图标
                     //清除图层
+                    rg_mark_choose.setVisibility(View.GONE);
+                    ll_tool_operation.setVisibility(View.GONE);
                     setAction(R.id.action_add,R.mipmap.ic_action_new);
                 }
                 return true;

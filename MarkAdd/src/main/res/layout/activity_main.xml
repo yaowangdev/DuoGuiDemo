@@ -10,13 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         mapoptions.MapType="Streets"
-        mapoptions.ZoomLevel="3"
-        mapoptions.center="21.0, -86.0"
+        mapoptions.ZoomLevel="4"
+        mapoptions.center="39.056215, -96.195668"
         />
 
 
     <RadioGroup
-        android:id="@+id/ll_mark_choose"
+        android:id="@+id/rg_mark_choose"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,11 +34,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="线"
+            android:checked="false"
             />
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="面"
+            android:checked="false"
             />
     </RadioGroup>
 
@@ -52,18 +54,21 @@
         android:visibility="gone"
         >
         <ImageView
+            android:id="@+id/iv_clear"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@mipmap/edit_ic_clear"
             android:layout_marginTop="10dp"
             />
         <ImageView
+            android:id="@+id/iv_back_step"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@mipmap/edit_ic_back_step"
             android:layout_marginTop="10dp"
             />
         <ImageView
+            android:id="@+id/iv_save"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@mipmap/edit_ic_save"
