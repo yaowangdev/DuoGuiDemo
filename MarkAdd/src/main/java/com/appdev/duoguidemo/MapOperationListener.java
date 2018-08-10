@@ -1,13 +1,21 @@
 package com.appdev.duoguidemo;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.MotionEvent;
 
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.MapOnTouchListener;
 import com.esri.android.map.MapView;
 import com.esri.android.map.event.OnStatusChangedListener;
+import com.esri.core.geometry.MultiPath;
 import com.esri.core.geometry.Point;
+import com.esri.core.geometry.Polygon;
+import com.esri.core.geometry.Polyline;
+import com.esri.core.map.Graphic;
+import com.esri.core.symbol.SimpleFillSymbol;
+import com.esri.core.symbol.SimpleLineSymbol;
+import com.esri.core.symbol.SimpleMarkerSymbol;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +32,12 @@ public class MapOperationListener extends MapOnTouchListener {
     private boolean mMidPointSelected = false;//中点是否被选中
     private boolean mVertexSelected = false;//顶点是否被选中
     private int mInsertingIndex = 0;
+
+    SimpleMarkerSymbol mRedMarkerSymbol = new SimpleMarkerSymbol(Color.RED, 20, SimpleMarkerSymbol.STYLE.CIRCLE);
+
+    SimpleMarkerSymbol mBlackMarkerSymbol = new SimpleMarkerSymbol(Color.BLACK, 20, SimpleMarkerSymbol.STYLE.CIRCLE);
+
+    SimpleMarkerSymbol mGreenMarkerSymbol = new SimpleMarkerSymbol(Color.GREEN, 15, SimpleMarkerSymbol.STYLE.CIRCLE);
 
 
     public MapOperationListener(Context context, MapView view) {
@@ -42,9 +56,6 @@ public class MapOperationListener extends MapOnTouchListener {
             }
         });
     }
-
-
-
 
     @Override
     public boolean onSingleTap(MotionEvent point) {
@@ -97,13 +108,89 @@ public class MapOperationListener extends MapOnTouchListener {
     }
 
     private void drawPolylineOrPolygon() {
+        Graphic graphic;
+        MultiPath multipath;
+        // Create and add graphics layer if it doesn't already exist
+        if (mGraphicsLayerEditing == null) {
+            mGraphicsLayerEditing = new GraphicsLayer();
+            mapView.addLayer(mGraphicsLayerEditing);
+        }
+        if (mPoints.size() > 1) {
+            // Build a MultiPath containing the vertices
+            if (mEditMode == EditMode.POLYLINE) {
+                multipath = new Polyline();
+            } else {
+                multipath = new Polygon();
+            }
+            multipath.startPath(mPoints.get(0));
+            for (int i = 1; i < mPoints.size(); i++) {
+                multipath.lineTo(mPoints.get(i));
+            }
 
+            // Draw it using a line or fill symbol
+            if (mEditMode == EditMode.POLYLINE) {
+                graphic = new Graphic(multipath, new SimpleLineSymbol(Color.BLACK, 4));
+            } else {
+                SimpleFillSymbol simpleFillSymbol = new SimpleFillSymbol(Color.YELLOW);
+                simpleFillSymbol.setAlpha(100);
+                simpleFillSymbol.setOutline(new SimpleLineSymbol(Color.BLACK, 4));
+                graphic = new Graphic(multipath, (simpleFillSymbol));
+            }
+            mGraphicsLayerEditing.addGraphic(graphic);
+        }
     }
 
     private void drawMidPoints() {
+        int index;
+        Graphic graphic;
+        midPoints.clear();
+        if (mPoints.size() > 1) {
+
+            // Build new list of mid-points
+            for (int i = 1; i < mPoints.size(); i++) {
+                Point p1 = mPoints.get(i - 1);
+                Point p2 = mPoints.get(i);
+                midPoints.add(new Point((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2));
+            }
+            if (mEditMode == EditMode.POLYGON && mPoints.size() > 2) {
+                // Complete the circle
+                Point p1 = mPoints.get(0);
+                Point p2 = mPoints.get(mPoints.size() - 1);
+                midPoints.add(new Point((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2));
+            }
+            index = 0;
+            for (Point pt : midPoints) {
+                if (mMidPointSelected && mInsertingIndex == index) {
+                    graphic = new Graphic(pt, mRedMarkerSymbol);
+                } else {
+                    graphic = new Graphic(pt, mGreenMarkerSymbol);
+                }
+                mGraphicsLayerEditing.addGraphic(graphic);
+                index++;
+            }
+        }
     }
 
     private void drawVertices() {
+
+        int index = 0;
+        SimpleMarkerSymbol symbol;
+
+        for (Point pt : mPoints) {
+            if (mVertexSelected && index == mInsertingIndex) {
+                // This vertex is currently selected so make it red
+                symbol = mRedMarkerSymbol;
+            } else if (index == mPoints.size() - 1 && !mMidPointSelected && !mVertexSelected) {
+                // Last vertex and none currently selected so make it red
+                symbol = mRedMarkerSymbol;
+            } else {
+                // Otherwise make it black
+                symbol = mBlackMarkerSymbol;
+            }
+            Graphic graphic = new Graphic(pt, symbol);
+            mGraphicsLayerEditing.addGraphic(graphic);
+            index++;
+        }
     }
 
     //点击是否与顶点或者中点重合
@@ -135,7 +222,26 @@ public class MapOperationListener extends MapOnTouchListener {
     }
 
     private void movePoint(Point point) {
-
+        if (mMidPointSelected) {
+            // Move mid-point to the new location and make it a vertex
+            mPoints.add(mInsertingIndex + 1, point);
+        } else {
+            // Must be a vertex: move it to the new location
+            ArrayList<Point> temp = new ArrayList<>();
+            for (int i = 0; i < mPoints.size(); i++) {
+                if (i == mInsertingIndex) {
+                    temp.add(point);
+                } else {
+                    temp.add(mPoints.get(i));
+                }
+            }
+            mPoints.clear();
+            mPoints.addAll(temp);
+        }
+        // Go back to the normal drawing mode and save the new editing state
+        mMidPointSelected = false;
+        mVertexSelected = false;
+        mEditingStates.add(new EditingStates(mPoints, mMidPointSelected, mVertexSelected, mInsertingIndex));
     }
 
 
