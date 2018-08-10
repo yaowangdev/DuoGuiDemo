@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout ll_tool_operation;
     private ImageView iv_clear,iv_back_step,iv_save;
     private MapOperationListener mapListener;
+    private boolean isShow;
+
 
 
 
@@ -32,13 +34,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initMapListener();
         initView();
         addLayer();
-        initMapListener();
     }
 
     private void initView() {
-        mMapView = findViewById(R.id.map_view);
         rg_mark_choose = findViewById(R.id.rg_mark_choose);
         ll_tool_operation = findViewById(R.id.ll_tool_operation);
         iv_clear = findViewById(R.id.iv_clear);
@@ -51,20 +52,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
                 switch (i){
-                    case 0:
-                        mapListener.setEditMode(EditMode.POINT);
+                    case R.id.rb_point:
+                        actionClear();
+                        if(isShow){
+                            mapListener.setEditMode(EditMode.POINT);
+                        }
                         break;
-                    case 1:
+                    case R.id.rb_line:
+                        actionClear();
                         mapListener.setEditMode(EditMode.POLYLINE);
                         break;
-                    case 2:
+                    case R.id.rb_polygon:
+                        actionClear();
                         mapListener.setEditMode(EditMode.POLYGON);
                         break;
                 }
-
             }
         });
         rg_mark_choose.check(R.id.rb_point);
+
     }
 
     private void addLayer() {
@@ -74,9 +80,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void initMapListener() {
+        mMapView = findViewById(R.id.map_view);
         mapListener = new MapOperationListener(this,mMapView);
         mMapView.setOnTouchListener(mapListener);
-        mapListener.setEditMode(mEditMode);
+        mapListener.setEditMode(EditMode.NONE);
     }
 
 
@@ -93,34 +100,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.iv_clear:
-
+                actionClear();
                 break;
-
             case R.id.iv_back_step:
-
+                actionBackStep();
                 break;
-
             case R.id.iv_save:
-
-
+                actionSave();
                 break;
         }
 
     }
 
+    private void actionClear() {
+        mapListener.actionClear();
+    }
+
+    private void actionBackStep() {
+        mapListener.actionBackStep();
+    }
+
+    private void actionSave() {
+        mapListener.actionSave();
+    }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        mEditMode = mapListener.getEditMode();
         switch (item.getItemId()){
             case R.id.action_add:
-                if(mEditMode==EditMode.NONE || mEditMode==EditMode.SAVING){
+                if(!isShow){
                     //开启图形绘制界面
                     //添加界面
                     rg_mark_choose.setVisibility(View.VISIBLE);
                     ll_tool_operation.setVisibility(View.VISIBLE);
                     //变换图标
                     setAction(R.id.action_add,R.mipmap.ic_action_cancel);
-                    mEditMode=EditMode.POINT;
+                    rg_mark_choose.check(R.id.rb_point);
+                    mapListener.setEditMode(EditMode.POINT);
                 }else {
                     //关闭图形绘制界面
                     //变换图标
@@ -128,8 +147,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     rg_mark_choose.setVisibility(View.GONE);
                     ll_tool_operation.setVisibility(View.GONE);
                     setAction(R.id.action_add,R.mipmap.ic_action_new);
-                    mEditMode=EditMode.NONE;
+                    mapListener.actionClear();
+                    mapListener.setEditMode(EditMode.NONE);
                 }
+                isShow=!isShow;
                 return true;
             case R.id.action_search:
 

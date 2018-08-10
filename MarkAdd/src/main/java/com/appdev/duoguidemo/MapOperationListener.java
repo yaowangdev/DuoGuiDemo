@@ -3,6 +3,7 @@ package com.appdev.duoguidemo;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.MapOnTouchListener;
@@ -28,15 +29,13 @@ public class MapOperationListener extends MapOnTouchListener {
 
     private List<Point> mPoints = new ArrayList<>();
     private List<Point> midPoints = new ArrayList<>();
-    List<EditingStates> mEditingStates = new ArrayList<>();
+    private List<EditingStates> mEditingStates = new ArrayList<>();
     private boolean mMidPointSelected = false;//中点是否被选中
     private boolean mVertexSelected = false;//顶点是否被选中
     private int mInsertingIndex = 0;
 
     SimpleMarkerSymbol mRedMarkerSymbol = new SimpleMarkerSymbol(Color.RED, 20, SimpleMarkerSymbol.STYLE.CIRCLE);
-
     SimpleMarkerSymbol mBlackMarkerSymbol = new SimpleMarkerSymbol(Color.BLACK, 20, SimpleMarkerSymbol.STYLE.CIRCLE);
-
     SimpleMarkerSymbol mGreenMarkerSymbol = new SimpleMarkerSymbol(Color.GREEN, 15, SimpleMarkerSymbol.STYLE.CIRCLE);
 
 
@@ -56,6 +55,48 @@ public class MapOperationListener extends MapOnTouchListener {
             }
         });
     }
+
+    public void actionClear(){
+//        mEditMode = EditMode.NONE;
+        // Clear feature editing data
+        mPoints.clear();
+        midPoints.clear();
+        mEditingStates.clear();
+
+        mMidPointSelected = false;
+        mVertexSelected = false;
+        mInsertingIndex = 0;
+
+        if (mGraphicsLayerEditing != null) {
+            mGraphicsLayerEditing.removeAll();
+        }
+    }
+
+    public void actionBackStep(){
+        if(mEditingStates==null || mEditingStates.size()==0){
+            Toast.makeText(mContext, "初始化状态", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mEditingStates.remove(mEditingStates.size() - 1);
+        mPoints.clear();
+        if (mEditingStates.size() == 0) {
+            mMidPointSelected = false;
+            mVertexSelected = false;
+            mInsertingIndex = 0;
+        } else {
+            EditingStates state = mEditingStates.get(mEditingStates.size() - 1);
+            mPoints.addAll(state.points);
+            mMidPointSelected = state.midPointSelected;
+            mVertexSelected = state.vertexSelected;
+            mInsertingIndex = state.insertingIndex;
+        }
+        refresh();
+    }
+
+    public void actionSave(){
+
+    }
+
 
     @Override
     public boolean onSingleTap(MotionEvent point) {
@@ -98,7 +139,7 @@ public class MapOperationListener extends MapOnTouchListener {
         refresh();
     }
 
-    private void refresh() {
+    public void refresh() {
         if (mGraphicsLayerEditing != null) {
             mGraphicsLayerEditing.removeAll();
         }
