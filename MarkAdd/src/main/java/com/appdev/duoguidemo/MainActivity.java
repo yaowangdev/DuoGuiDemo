@@ -18,7 +18,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    private EditMode mEditMode;
     private Menu mMenuItem;
     private MapView mMapView;
     private RadioGroup rg_mark_choose;
@@ -128,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        mEditMode = mapListener.getEditMode();
         switch (item.getItemId()){
             case R.id.action_add:
                 if(!isShow){
@@ -142,10 +140,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mapListener.setEditMode(EditMode.POINT);
                 }else {
                     //关闭图形绘制界面
-                    //变换图标
-                    //清除图层
+                    //去除界面
                     rg_mark_choose.setVisibility(View.GONE);
                     ll_tool_operation.setVisibility(View.GONE);
+                    //变换图标
                     setAction(R.id.action_add,R.mipmap.ic_action_new);
                     mapListener.actionClear();
                     mapListener.setEditMode(EditMode.NONE);
