@@ -1,10 +1,12 @@
-package com.appdev.duoguidemo;
+package com.appdev.duoguidemo.listener;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
+import com.appdev.duoguidemo.entity.EditMode;
+import com.appdev.duoguidemo.entity.EditingStates;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.MapOnTouchListener;
 import com.esri.android.map.MapView;
@@ -93,9 +95,11 @@ public class MapOperationListener extends MapOnTouchListener {
         refresh();
     }
 
-    public void actionSave(){
-
-    }
+//    public void actionSave(){
+//        //1根据不同的geometry弹出对话框
+//        //2获取颜色，图标
+//
+//    }
 
 
     @Override

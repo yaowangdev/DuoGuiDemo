@@ -10,11 +10,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
+import com.appdev.duoguidemo.entity.EditMode;
+import com.appdev.duoguidemo.entity.Mark;
+import com.appdev.duoguidemo.entity.PointStyle;
+import com.appdev.duoguidemo.listener.MapOperationListener;
+import com.appdev.duoguidemo.presenter.IMarkPresenter;
+import com.appdev.duoguidemo.presenter.impl.MarkPresenterImpl;
+import com.appdev.duoguidemo.view.IMarkView;
 import com.esri.android.map.Layer;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, IMarkView {
 
 
 
@@ -26,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MapOperationListener mapListener;
     private boolean isShow;
 
+    private IMarkPresenter iMarkPresenter;
+
+
 
 
 
@@ -36,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initMapListener();
         initView();
         addLayer();
+        iMarkPresenter = new MarkPresenterImpl(this);
     }
 
     private void initView() {
@@ -120,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void actionSave() {
-        mapListener.actionSave();
+        iMarkPresenter.showAddMarkDialog(this,null);
     }
 
 
@@ -162,5 +175,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setAction(int resId, int icon) {
         MenuItem item = mMenuItem.findItem(resId);
         item.setIcon(icon);
+    }
+
+    @Override
+    public void showAddPointDialog(Mark mark, List<PointStyle> pointStyles) {
+        //显示添加点的Dialog
+
+    }
+
+    @Override
+    public void showAddLineDialog(Mark mark) {
+        //显示添加线的Dialog
+
+    }
+
+    @Override
+    public void showAddPolygonDialog(Mark mark) {
+        //显示添加polygon的Dialog
+
     }
 }
