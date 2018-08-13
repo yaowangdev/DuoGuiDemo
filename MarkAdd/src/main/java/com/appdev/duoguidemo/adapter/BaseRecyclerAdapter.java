@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.augurit.am.fw.utils.ListUtil;
+import com.appdev.duoguidemo.util.ListUtil;
 
 import java.util.List;
 
