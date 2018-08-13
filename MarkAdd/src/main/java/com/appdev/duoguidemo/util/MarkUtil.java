@@ -9,11 +9,14 @@ import android.graphics.drawable.BitmapDrawable;
 import com.appdev.duoguidemo.R;
 import com.appdev.duoguidemo.common.Constants;
 import com.appdev.duoguidemo.entity.Mark;
+import com.appdev.duoguidemo.entity.PointStyle;
 import com.esri.core.geometry.Geometry;
 import com.esri.core.symbol.FillSymbol;
 import com.esri.core.symbol.LineSymbol;
 import com.esri.core.symbol.SimpleFillSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
+
+import java.util.List;
 
 public class MarkUtil {
 
@@ -62,7 +65,7 @@ public class MarkUtil {
                 mark.setMarkName("新增点");
                 mark.setMarkMemo("备注");
                 mark.setGeometry(geometry);
-                mark.setPointDrawableName("marker_redpin");
+                mark.setPointDrawableName(Constants.DEFALUT_POINT_STYLE);
                 return mark;
             case POLYLINE:
                 mark.setMarkName("新增标注");
@@ -82,6 +85,23 @@ public class MarkUtil {
                 return mark;
         }
         return mark;
+    }
+
+
+
+    /**
+     * 从标注中获取到它的点样式
+     *
+     * @param mark
+     * @return
+     */
+    public static PointStyle getPointStyleFromMark(Mark mark, List<PointStyle> pointStyles) {
+        for (PointStyle pointStyle : pointStyles) {
+            if (pointStyle.getName().equals(mark.getPointDrawableName())) {
+                return pointStyle;
+            }
+        }
+        return null;
     }
 
 

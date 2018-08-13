@@ -1,7 +1,11 @@
 package com.appdev.duoguidemo.fragment;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -12,12 +16,16 @@ import android.widget.ImageView;
 
 import com.appdev.duoguidemo.R;
 import com.appdev.duoguidemo.adapter.PadPointAdapter;
+import com.appdev.duoguidemo.common.Constants;
 import com.appdev.duoguidemo.entity.Mark;
 import com.appdev.duoguidemo.entity.MarkStyle;
 import com.appdev.duoguidemo.entity.PointStyle;
 import com.appdev.duoguidemo.ui.GridViewForScrollview;
+import com.appdev.duoguidemo.util.MarkUtil;
+import com.appdev.duoguidemo.util.ResourceUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PointDialog extends BaseMarkFragment{
     private Mark mMark;
@@ -26,10 +34,10 @@ public class PointDialog extends BaseMarkFragment{
 
 
 
-    public static PointDialog newInstance(Mark mark, ArrayList<PointStyle> list) {
+    public static PointDialog newInstance(Mark mark, List<PointStyle> list) {
         Bundle args = new Bundle();
         args.putParcelable("Mark",mark);
-        args.putParcelableArrayList("PointList",list);
+        args.putParcelableArrayList("PointList", (ArrayList<? extends Parcelable>) list);
         PointDialog fragment = new PointDialog();
         fragment.setArguments(args);
         fragment.setStyle(STYLE_NORMAL, R.style.MyDialog);
@@ -95,6 +103,14 @@ public class PointDialog extends BaseMarkFragment{
 
     @Override
     public Drawable getBackgroundForChangeStyleButton() {
-        return null;
+        //获取到点样式
+        mPointStyle = MarkUtil.getPointStyleFromMark(mMark,mPointStyles);
+        if (mPointStyle == null){ //返回默认的点样式
+            int mipMapId = ResourceUtil.getMipMapId(getActivity(), Constants.DEFALUT_POINT_STYLE);
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(),mipMapId);
+            //int resId =  resources.getIdentifier(picName, "mipmap", context.getPackageName());
+            return new BitmapDrawable(bitmap);
+        }
+        return new BitmapDrawable(mPointStyle.getBitmap());
     }
 }

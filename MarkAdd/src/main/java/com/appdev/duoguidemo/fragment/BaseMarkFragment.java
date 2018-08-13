@@ -39,7 +39,7 @@ public abstract class BaseMarkFragment extends DialogFragment {
     private AppCompatButton btn_changeStyle_outer;
 
     private MarkStyle mEditedMarkInfo;
-    private OnLineSaveButtonClickListener mOnSaveButtonClickListener;
+    private OnSaveButtonClickListener mOnSaveButtonClickListener;
 
 
     @Nullable
@@ -114,7 +114,6 @@ public abstract class BaseMarkFragment extends DialogFragment {
                 dismiss();
 
                 if(mOnSaveButtonClickListener != null){
-
                     if (mEditedMarkInfo == null){
                         mEditedMarkInfo = new MarkStyle();
                         completeEditedMarkInfo();
@@ -242,12 +241,12 @@ public abstract class BaseMarkFragment extends DialogFragment {
     public abstract Drawable getBackgroundForChangeStyleButton();
 
 
-    public void setOnSaveButtonClickListener(OnLineSaveButtonClickListener onSaveButtonClickListener){
+    public void setOnSaveButtonClickListener(OnSaveButtonClickListener onSaveButtonClickListener){
         this.mOnSaveButtonClickListener = onSaveButtonClickListener;
     }
 
 
-    public interface OnLineSaveButtonClickListener{
+    public interface OnSaveButtonClickListener{
         void onClick(MarkStyle allMarkInfo);
     }
 

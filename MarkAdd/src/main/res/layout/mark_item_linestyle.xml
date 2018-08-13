@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/ll_mark_changecolor"
+              android:layout_width="48dp"
+              android:layout_height="48dp"
+              android:gravity="center"
+              android:padding="10dp"
+              android:orientation="vertical"
+    >
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_line_color"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@color/colorAccent"/>
+</LinearLayout>

@@ -1,5 +1,6 @@
 package com.appdev.duoguidemo;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -10,16 +11,29 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
+import com.appdev.duoguidemo.common.Constants;
 import com.appdev.duoguidemo.entity.EditMode;
 import com.appdev.duoguidemo.entity.Mark;
+import com.appdev.duoguidemo.entity.MarkStyle;
 import com.appdev.duoguidemo.entity.PointStyle;
+import com.appdev.duoguidemo.fragment.BaseMarkFragment;
+import com.appdev.duoguidemo.fragment.LineDialog;
+import com.appdev.duoguidemo.fragment.PointDialog;
+import com.appdev.duoguidemo.fragment.PolygonDialog;
 import com.appdev.duoguidemo.listener.MapOperationListener;
 import com.appdev.duoguidemo.presenter.IMarkPresenter;
 import com.appdev.duoguidemo.presenter.impl.MarkPresenterImpl;
+import com.appdev.duoguidemo.util.MarkUtil;
 import com.appdev.duoguidemo.view.IMarkView;
 import com.esri.android.map.Layer;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
+import com.esri.core.symbol.FillSymbol;
+import com.esri.core.symbol.LineSymbol;
+import com.esri.core.symbol.MarkerSymbol;
+import com.esri.core.symbol.PictureMarkerSymbol;
+import com.esri.core.symbol.SimpleFillSymbol;
+import com.esri.core.symbol.SimpleLineSymbol;
 
 import java.util.List;
 
@@ -178,20 +192,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void showAddPointDialog(Mark mark, List<PointStyle> pointStyles) {
+    public void showAddPointDialog(final Mark mark, List<PointStyle> pointStyles) {
         //显示添加点的Dialog
-
+        PointDialog pointDialog = PointDialog.newInstance(mark,pointStyles);
+        pointDialog.setOnSaveButtonClickListener(new BaseMarkFragment.OnSaveButtonClickListener() {
+                    @Override
+                    public void onClick(MarkStyle allMarkInfo) {
+                        Drawable drawable = MarkUtil.getPointDrawable(getApplicationContext(),allMarkInfo.getPointStyle());
+                        MarkerSymbol symbol = new PictureMarkerSymbol(getApplicationContext(), drawable);
+                        mark.setSymbol(symbol);
+                        mark.setPointDrawableName(allMarkInfo.getPointStyle());
+                        mark.setMarkMemo(allMarkInfo.getMarkMemo());
+                        mark.setMarkName(allMarkInfo.getMarkName());
+                        //保存到本地
+                    }
+                });
+        pointDialog.show(getSupportFragmentManager(),"PointDialog");
     }
 
     @Override
-    public void showAddLineDialog(Mark mark) {
+    public void showAddLineDialog(final Mark mark) {
         //显示添加线的Dialog
+        LineDialog lineDialog = LineDialog.newInstance(mark);
+        lineDialog.setOnSaveButtonClickListener(new BaseMarkFragment.OnSaveButtonClickListener() {
+            @Override
+            public void onClick(MarkStyle allMarkInfo) {
+                //进行上传数据到服务端
+                int width = Constants.DEFAULT_LINE_WIDTH;
+                LineSymbol lineSymbol = new SimpleLineSymbol(allMarkInfo.getLineColor(), width);
+                mark.setSymbol(lineSymbol);
+                mark.setPointDrawableName(allMarkInfo.getPointStyle());
+                mark.setMarkMemo(allMarkInfo.getMarkMemo());
+                mark.setMarkName(allMarkInfo.getMarkName());
+            }
+        });
+        lineDialog.show(getSupportFragmentManager(),"LineDialog");
 
     }
 
     @Override
-    public void showAddPolygonDialog(Mark mark) {
+    public void showAddPolygonDialog(final Mark mark) {
         //显示添加polygon的Dialog
+
+        PolygonDialog polygonDialog = PolygonDialog.newInstance(mark);
+        polygonDialog.setOnSaveButtonClickListener(new BaseMarkFragment.OnSaveButtonClickListener() {
+            @Override
+            public void onClick(MarkStyle allMarkInfo) {
+                //进行上传数据到服务端
+                FillSymbol fillSymbol = new SimpleFillSymbol(allMarkInfo.getInColor());
+                LineSymbol lineSymbol = new SimpleLineSymbol(allMarkInfo.getLineColor(), 3);
+                fillSymbol.setOutline(lineSymbol);
+                mark.setSymbol(fillSymbol);
+                mark.setPointDrawableName(allMarkInfo.getPointStyle());
+                mark.setMarkMemo(allMarkInfo.getMarkMemo());
+                mark.setMarkName(allMarkInfo.getMarkName());
+
+            }
+        });
+        polygonDialog.show(getSupportFragmentManager(),"PolygonDialog");
+
+
 
     }
 }
