@@ -38,9 +38,6 @@ import com.esri.core.symbol.SimpleLineSymbol;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, IMarkView {
-
-
-
     private Menu mMenuItem;
     private MapView mMapView;
     private RadioGroup rg_mark_choose;
@@ -50,10 +47,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isShow;
 
     private IMarkPresenter iMarkPresenter;
-
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,7 +171,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 isShow=!isShow;
                 return true;
             case R.id.action_search:
-
+                //跳出对话框，展现mark列表
+                iMarkPresenter.getAllMarks(getApplicationContext());
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -252,6 +246,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         polygonDialog.show(getSupportFragmentManager(),"PolygonDialog");
+    }
+
+    @Override
+    public void showMarkListDialog(List<Mark> marks) {
+
+
 
 
 

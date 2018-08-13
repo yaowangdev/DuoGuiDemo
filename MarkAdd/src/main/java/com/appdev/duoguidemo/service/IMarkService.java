@@ -14,4 +14,5 @@ public interface IMarkService {
 
     Observable<Boolean> ApplyAdd(Mark mark);
 
+    Observable<List<Mark>> getAllMarks(Context context);
 }

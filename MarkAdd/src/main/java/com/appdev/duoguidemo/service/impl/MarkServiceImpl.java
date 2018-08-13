@@ -11,10 +11,13 @@ import com.appdev.duoguidemo.entity.LocalMark;
 import com.appdev.duoguidemo.entity.Mark;
 import com.appdev.duoguidemo.entity.PointStyle;
 import com.appdev.duoguidemo.service.IMarkService;
+import com.appdev.duoguidemo.util.MarkUtil;
 import com.esri.core.symbol.FillSymbol;
 import com.esri.core.symbol.LineSymbol;
+import com.esri.core.symbol.Symbol;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -67,6 +70,45 @@ public class MarkServiceImpl implements IMarkService{
                     e.printStackTrace();
                 }
                 return false;
+            }
+        });
+    }
+
+    @Override
+    public Observable<List<Mark>> getAllMarks(final Context context) {
+        return Observable.fromCallable(new Callable<List<Mark>>() {
+            @Override
+            public List<Mark> call() throws Exception {
+                List<LocalMark> localMarks = mLocalDatabaseMarkDao.getMarks();
+                List<Mark> marks = new ArrayList<>();
+                for (LocalMark localMark : localMarks){
+                    Mark mark  = new Mark();
+                    mark.setCreateDate(localMark.getCreateDate());
+                    mark.setGeometry(localMark.getGeometry());
+                    mark.setMarkName(localMark.getMarkName());
+                    mark.setMarkMemo(localMark.getMarkMemo());
+                    mark.setId(localMark.getId());
+                    mark.setCreatePerson(localMark.getCreatePerson());
+                    Symbol symbol = null;
+                    switch (localMark.getGeometry().getType()){
+                        case POINT:
+                            symbol = MarkUtil.getPointSymbolFromLocalMark(context, localMark);
+                            mark.setPointDrawableName(localMark.getPointDrawableName());
+                            break;
+                        case LINE:
+                        case POLYLINE:
+                            symbol = MarkUtil.getLineSymbolFromLocalMark(localMark);
+                            break;
+                        case POLYGON:
+                            symbol = MarkUtil.getPolygonSymbolFromLocalMark(localMark);
+                            break;
+                    }
+                    mark.setSymbol(symbol);
+                    marks.add(mark);
+                }
+                //进行逆序，最后添加的在上面
+                Collections.reverse(marks);
+                return marks;
             }
         });
     }
