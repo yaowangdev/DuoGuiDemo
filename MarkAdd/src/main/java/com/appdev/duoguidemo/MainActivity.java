@@ -18,6 +18,7 @@ import com.appdev.duoguidemo.entity.MarkStyle;
 import com.appdev.duoguidemo.entity.PointStyle;
 import com.appdev.duoguidemo.fragment.BaseMarkFragment;
 import com.appdev.duoguidemo.fragment.LineDialog;
+import com.appdev.duoguidemo.fragment.MarkListDialog;
 import com.appdev.duoguidemo.fragment.PointDialog;
 import com.appdev.duoguidemo.fragment.PolygonDialog;
 import com.appdev.duoguidemo.listener.MapOperationListener;
@@ -140,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void actionSave() {
-        iMarkPresenter.showAddMarkDialog(this,null);
+        iMarkPresenter.showAddMarkDialog(this,mapListener.getGeometry());
     }
 
 
@@ -250,10 +251,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void showMarkListDialog(List<Mark> marks) {
-
-
-
-
-
+        MarkListDialog markListDialog = MarkListDialog.newInstance(marks);
+        markListDialog.show(getSupportFragmentManager(),"MarkListDialog");
     }
 }

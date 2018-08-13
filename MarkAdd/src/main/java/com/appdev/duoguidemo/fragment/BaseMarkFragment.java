@@ -16,6 +16,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.appdev.duoguidemo.R;
@@ -32,7 +33,7 @@ import java.util.List;
 public abstract class BaseMarkFragment extends DialogFragment {
 
     private LinearLayout dialog_main_layout;
-    private LinearLayout editMarkInfoView;
+    private View editMarkInfoView;
 
     private Mark mMark;
     private AppCompatButton btn_changeStyle_inner;
@@ -48,7 +49,7 @@ public abstract class BaseMarkFragment extends DialogFragment {
         mMark = getMark();
         View inflate = inflater.inflate(R.layout.dialog_main_layout, container, false);
         dialog_main_layout = inflate.findViewById(R.id.dialog_main_layout);
-        editMarkInfoView = (LinearLayout) inflater.inflate(R.layout.dialog_mark_set,null);
+        editMarkInfoView = View.inflate(getActivity(),R.layout.dialog_mark_set,null);
         dialog_main_layout.removeAllViews();
         dialog_main_layout.addView(editMarkInfoView);
         initDatas();
@@ -59,6 +60,7 @@ public abstract class BaseMarkFragment extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         //标注名称和标注备注的填写
         final EditText et_name = view.findViewById(R.id.et_editpolygon_name);
         et_name.setText(mMark.getMarkName());
@@ -141,6 +143,7 @@ public abstract class BaseMarkFragment extends DialogFragment {
             params.width = (int) (dm.widthPixels * 0.75);
             window.setAttributes(params);
         }
+
     }
 
     protected  void completeEditedMarkInfo(){

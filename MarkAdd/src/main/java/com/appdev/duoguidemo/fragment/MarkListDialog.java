@@ -1,10 +1,11 @@
 package com.appdev.duoguidemo.fragment;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -14,13 +15,16 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.appdev.duoguidemo.R;
+import com.appdev.duoguidemo.adapter.MarkAdapter;
 import com.appdev.duoguidemo.entity.Mark;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MarkListDialog extends DialogFragment{
+public class MarkListDialog extends DialogFragment {
     private RecyclerView recyclerView;
+    private MarkAdapter markAdapter;
+    private List<Mark> marks;
 
 
 
@@ -33,6 +37,11 @@ public class MarkListDialog extends DialogFragment{
         return fragment;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        marks = getArguments().getParcelableArrayList("MarkList");
+    }
 
     @Nullable
     @Override
@@ -45,7 +54,9 @@ public class MarkListDialog extends DialogFragment{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.mark_recyclerview);
-
+        markAdapter = new MarkAdapter(getActivity(),marks);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(markAdapter);
     }
 
 

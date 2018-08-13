@@ -11,6 +11,7 @@ import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.MapOnTouchListener;
 import com.esri.android.map.MapView;
 import com.esri.android.map.event.OnStatusChangedListener;
+import com.esri.core.geometry.Geometry;
 import com.esri.core.geometry.MultiPath;
 import com.esri.core.geometry.Point;
 import com.esri.core.geometry.Polygon;
@@ -28,6 +29,7 @@ public class MapOperationListener extends MapOnTouchListener {
     private MapView mapView;
     private EditMode mEditMode;
     private GraphicsLayer mGraphicsLayerEditing;
+    private Geometry mGeometry;//当前绘制的图形
 
     private List<Point> mPoints = new ArrayList<>();
     private List<Point> midPoints = new ArrayList<>();
@@ -101,6 +103,10 @@ public class MapOperationListener extends MapOnTouchListener {
 //
 //    }
 
+    public Geometry getGeometry() {
+        return mGeometry;
+    }
+
 
     @Override
     public boolean onSingleTap(MotionEvent point) {
@@ -147,9 +153,19 @@ public class MapOperationListener extends MapOnTouchListener {
         if (mGraphicsLayerEditing != null) {
             mGraphicsLayerEditing.removeAll();
         }
-        drawPolylineOrPolygon();
-        drawMidPoints();
-        drawVertices();
+        if(mEditMode==EditMode.POINT){
+            drawPoint();
+        }else {
+            drawPolylineOrPolygon();
+            drawMidPoints();
+            drawVertices();
+        }
+    }
+
+    private void drawPoint() {
+        Graphic graphic = new Graphic(mPoints.get(0),mRedMarkerSymbol);
+        mGraphicsLayerEditing.addGraphic(graphic);
+        mGeometry = graphic.getGeometry();
     }
 
     private void drawPolylineOrPolygon() {
@@ -182,6 +198,7 @@ public class MapOperationListener extends MapOnTouchListener {
                 graphic = new Graphic(multipath, (simpleFillSymbol));
             }
             mGraphicsLayerEditing.addGraphic(graphic);
+            mGeometry = graphic.getGeometry();
         }
     }
 
