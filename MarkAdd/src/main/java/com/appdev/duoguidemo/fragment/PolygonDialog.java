@@ -40,7 +40,6 @@ public class PolygonDialog extends LineDialog {
     @Override
     protected View getChangedStyleView() {
         super.getChangedStyleView();
-
         tv_title.setText("选择面的填充颜色");
         iv_return.setOnClickListener(new View.OnClickListener() {
             @Override

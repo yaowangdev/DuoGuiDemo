@@ -79,4 +79,9 @@ public class MarkPresenterImpl implements IMarkPresenter{
 
 
     }
+
+    @Override
+    public void applyAdd(Mark mark) {
+
+    }
 }

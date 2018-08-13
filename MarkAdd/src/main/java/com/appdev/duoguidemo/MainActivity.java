@@ -205,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mark.setMarkMemo(allMarkInfo.getMarkMemo());
                         mark.setMarkName(allMarkInfo.getMarkName());
                         //保存到本地
+                        iMarkPresenter.applyAdd(mark);
                     }
                 });
         pointDialog.show(getSupportFragmentManager(),"PointDialog");
@@ -224,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mark.setPointDrawableName(allMarkInfo.getPointStyle());
                 mark.setMarkMemo(allMarkInfo.getMarkMemo());
                 mark.setMarkName(allMarkInfo.getMarkName());
+                iMarkPresenter.applyAdd(mark);
             }
         });
         lineDialog.show(getSupportFragmentManager(),"LineDialog");
@@ -246,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mark.setPointDrawableName(allMarkInfo.getPointStyle());
                 mark.setMarkMemo(allMarkInfo.getMarkMemo());
                 mark.setMarkName(allMarkInfo.getMarkName());
-
+                iMarkPresenter.applyAdd(mark);
             }
         });
         polygonDialog.show(getSupportFragmentManager(),"PolygonDialog");

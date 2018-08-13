@@ -6,16 +6,28 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.appdev.duoguidemo.R;
+import com.appdev.duoguidemo.dao.LocalDatabaseMarkDao;
+import com.appdev.duoguidemo.entity.LocalMark;
+import com.appdev.duoguidemo.entity.Mark;
 import com.appdev.duoguidemo.entity.PointStyle;
 import com.appdev.duoguidemo.service.IMarkService;
+import com.esri.core.symbol.FillSymbol;
+import com.esri.core.symbol.LineSymbol;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 public class MarkServiceImpl implements IMarkService{
+    protected LocalDatabaseMarkDao mLocalDatabaseMarkDao;
 
+    public MarkServiceImpl() {
+        mLocalDatabaseMarkDao = new LocalDatabaseMarkDao();
+    }
 
     @Override
     public Observable<List<PointStyle>> getPointStyleList(Context context) {
@@ -37,5 +49,75 @@ public class MarkServiceImpl implements IMarkService{
         pointStyle2.setName("mark_ic_marker_flag");
         list.add(pointStyle2);
         return Observable.just(list);
+    }
+
+    @Override
+    public Observable<Boolean> ApplyAdd(final Mark mark) {
+        return Observable.fromCallable(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                List<LocalMark> marks = mLocalDatabaseMarkDao.getMarks();
+                LocalMark localMark = transFromMarkToLocalMark(mark);
+                //id 数据库自动增加，不需要设置
+                try {
+                    mark.setId(marks.size());
+                    mLocalDatabaseMarkDao.addMark(localMark);
+                    return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+        });
+    }
+
+    private LocalMark transFromMarkToLocalMark(Mark mark) {
+        LocalMark localMark = new LocalMark();
+        if(mark.getCreateDate() == null){
+            mark.setCreateDate(System.currentTimeMillis());
+        }
+        localMark.setCreateDate(mark.getCreateDate());
+        localMark.setGeometry(mark.getGeometry());
+        localMark.setMarkName(mark.getMarkName());
+        localMark.setMarkMemo(mark.getMarkMemo());
+        localMark.setCreatePerson("userid");
+        switch (mark.getGeometry().getType()){
+            case POINT:
+                String styleStr = mark.getPointDrawableName();
+                if (styleStr != null){
+                    localMark.setPointDrawableName(styleStr);
+                }
+                localMark.setInColor("#"); //进行填充假数据
+                localMark.setLineColor("#");
+                localMark.setLineWidth(0);
+                break;
+            case POLYLINE:
+            case LINE:
+                String polylineColor = "#"+ Integer.toHexString(((LineSymbol)mark.getSymbol()).getColor()); //获取到线的颜色
+                int lineWidth = (int) ((LineSymbol)mark.getSymbol()).getWidth(); //获取到线的宽度
+                if (polylineColor != null){
+                    localMark.setLineColor(polylineColor);
+                }
+                if (lineWidth != 0){
+                    localMark.setLineWidth(lineWidth);
+                }
+
+                localMark.setInColor("#");//进行填充假数据
+                localMark.setPointDrawableName("*");
+                break;
+            case POLYGON:
+                String lineColor = "#"+ Integer.toHexString(((FillSymbol)mark.getSymbol()).getOutline().getColor());
+                String inColor = "#"+ Integer.toHexString(((FillSymbol)mark.getSymbol()).getColor());
+                if (lineColor != null){
+                    localMark.setLineColor(lineColor);
+                }
+                if (inColor != null){
+                    localMark.setInColor(inColor);
+                }
+                localMark.setLineWidth(5);
+                localMark.setPointDrawableName("*");//进行填充假数据
+                break;
+        }
+        return localMark;
     }
 }
