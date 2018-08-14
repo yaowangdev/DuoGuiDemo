@@ -20,6 +20,7 @@ public class PolygonDialog extends LineDialog {
         args.putParcelable("Mark",mark);
         PolygonDialog fragment = new PolygonDialog();
         fragment.setArguments(args);
+        fragment.setStyle(STYLE_NORMAL, R.style.MyDialog);
         return fragment;
     }
 

@@ -34,6 +34,7 @@ public class MarkListDialog extends DialogFragment {
         args.putParcelableArrayList("MarkList", (ArrayList<? extends Parcelable>) marks);
         MarkListDialog fragment = new MarkListDialog();
         fragment.setArguments(args);
+        fragment.setStyle(STYLE_NORMAL, R.style.MyDialog);
         return fragment;
     }
 
@@ -46,7 +47,7 @@ public class MarkListDialog extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_mark_list,container,false);
+        View view = inflater.inflate(R.layout.dialog_mark_list,null);
         return view;
     }
 

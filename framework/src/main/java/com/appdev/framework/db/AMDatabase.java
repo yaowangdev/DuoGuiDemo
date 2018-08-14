@@ -138,16 +138,6 @@ public class AMDatabase {
     }
 
     /**
-     * 查询所有
-     * @param clazz 查询表类型
-     * @param <T>
-     * @return
-     */
-    public <T> List<T> getQueryAll(Class<T> clazz){
-        return liteOrm.query(clazz);
-    }
-
-    /**
      * 查询某字段等于value的值
      * @param clazz 表类型
      * @param field 表字段
@@ -157,6 +147,16 @@ public class AMDatabase {
      */
     public <T> List<T> getQueryByWhere(Class<T> clazz, String field, String value){
         return liteOrm.query(new QueryBuilder<T>(clazz).where(field + "=?", value));
+    }
+
+    /**
+     * 查询所有
+     * @param clazz 查询表类型
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> getQueryAll(Class<T> clazz){
+        return liteOrm.query(clazz);
     }
 
     /**

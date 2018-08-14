@@ -36,6 +36,7 @@ public class LineDialog extends BaseMarkFragment {
         args.putParcelable("Mark",mark);
         LineDialog fragment = new LineDialog();
         fragment.setArguments(args);
+        fragment.setStyle(STYLE_NORMAL, R.style.MyDialog);
         return fragment;
     }
 
