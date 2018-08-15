@@ -123,6 +123,7 @@ public class MarkPresenterImpl implements IMarkPresenter{
 
                     @Override
                     public void onNext(List<Mark> marks) {
+                        markView.drawMarksOnMap(marks);
                         markView.showMarkListDialog(marks);
                     }
 

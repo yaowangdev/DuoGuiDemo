@@ -14,4 +14,6 @@ public interface IMarkView {
     void showAddPolygonDialog(Mark mark);
 
     void showMarkListDialog(List<Mark> marks);
+
+    void drawMarksOnMap(List<Mark> marks);
 }

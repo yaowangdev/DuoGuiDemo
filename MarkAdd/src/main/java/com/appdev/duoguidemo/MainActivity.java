@@ -1,7 +1,9 @@
 package com.appdev.duoguidemo;
 
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,9 +28,11 @@ import com.appdev.duoguidemo.presenter.IMarkPresenter;
 import com.appdev.duoguidemo.presenter.impl.MarkPresenterImpl;
 import com.appdev.duoguidemo.util.MarkUtil;
 import com.appdev.duoguidemo.view.IMarkView;
+import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.Layer;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
+import com.esri.core.map.Graphic;
 import com.esri.core.symbol.FillSymbol;
 import com.esri.core.symbol.LineSymbol;
 import com.esri.core.symbol.MarkerSymbol;
@@ -37,6 +41,7 @@ import com.esri.core.symbol.SimpleFillSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
 
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, IMarkView {
     private Menu mMenuItem;
@@ -48,6 +53,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isShow;
 
     private IMarkPresenter iMarkPresenter;
+
+    private GraphicsLayer mainGraphic;
+
+    //用于当用户点击标注列表后高亮标注
+    protected Map<Integer, Integer> mPointMap = new ArrayMap<>();//把标注和graphic联系起来的集合，key是标注的id，value是对应graphic的id
+    protected Map<Integer, Integer> mLineMap = new ArrayMap<>();//把标注和graphic联系起来的集合，key是标注的id，value是对应graphic的id
+    protected Map<Integer, Integer> mPolygonMap = new ArrayMap<>();//把标注和graphic联系起来的集合，key是标注的id，value是对应graphic的id
+
+
+    //把graphic和标注列表联系起来的集合，key是graphic的id，value是对应列表中的位置position，用于当用户点击标注后高亮列表中对应位置
+    protected Map<Integer, Integer> mPointGraphicToListMap = new ArrayMap<>();
+    protected Map<Integer, Integer> mLineGraphicToListMap = new ArrayMap<>();
+    protected Map<Integer, Integer> mPolygonGraphicToListMap = new ArrayMap<>();
+
+
+    //把graphic和标注联系起来的集合，key是graphic的id，value是对应的标注
+    protected Map<Integer, Mark> mGraphicToMarkMap = new ArrayMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 isShow=!isShow;
                 return true;
             case R.id.action_search:
-                //跳出对话框，展现mark列表
                 iMarkPresenter.getAllMarks(getApplicationContext());
                 return true;
         }
@@ -191,18 +212,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //显示添加点的Dialog
         PointDialog pointDialog = PointDialog.newInstance(mark,pointStyles);
         pointDialog.setOnSaveButtonClickListener(new BaseMarkFragment.OnSaveButtonClickListener() {
-                    @Override
-                    public void onClick(MarkStyle allMarkInfo) {
-                        Drawable drawable = MarkUtil.getPointDrawable(getApplicationContext(),allMarkInfo.getPointStyle());
-                        MarkerSymbol symbol = new PictureMarkerSymbol(getApplicationContext(), drawable);
-                        mark.setSymbol(symbol);
-                        mark.setPointDrawableName(allMarkInfo.getPointStyle());
-                        mark.setMarkMemo(allMarkInfo.getMarkMemo());
-                        mark.setMarkName(allMarkInfo.getMarkName());
-                        //保存到本地
-                        iMarkPresenter.applyAdd(mark);
-                    }
-                });
+            @Override
+            public void onClick(MarkStyle allMarkInfo) {
+                Drawable drawable = MarkUtil.getPointDrawable(getApplicationContext(),allMarkInfo.getPointStyle());
+                MarkerSymbol symbol = new PictureMarkerSymbol(getApplicationContext(), drawable);
+                mark.setSymbol(symbol);
+                mark.setPointDrawableName(allMarkInfo.getPointStyle());
+                mark.setMarkMemo(allMarkInfo.getMarkMemo());
+                mark.setMarkName(allMarkInfo.getMarkName());
+                //保存到本地
+                iMarkPresenter.applyAdd(mark);
+            }
+        });
         pointDialog.show(getSupportFragmentManager(),"PointDialog");
     }
 
@@ -253,5 +274,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void showMarkListDialog(List<Mark> marks) {
         MarkListDialog markListDialog = MarkListDialog.newInstance(marks);
         markListDialog.show(getSupportFragmentManager(),"MarkListDialog");
+    }
+
+    @Override
+    public void drawMarksOnMap(List<Mark> marks) {
+        //清理界面
+        initGLForDrawAllMarks();
+        removeAllMarksOnMap();
+
+        for (int i = 0; i < marks.size(); i++) {
+            Mark mark = marks.get(i);
+            int graphicId = drawSingleMark(mark);
+            switch (mark.getGeometry().getType()) {
+                case POINT:
+                    //把所有的graphic保存起来，用于之后的高亮
+                    mPointMap.put(mark.getId(), graphicId);
+                    //将graphicID和position保存起来，用于之后的高亮列表
+                    mPointGraphicToListMap.put(graphicId, i);
+                    break;
+                case POLYLINE:
+                    //把所有的graphic保存起来，用于之后的高亮
+                    mLineMap.put(mark.getId(), graphicId);
+                    mLineGraphicToListMap.put(graphicId, i);
+                    break;
+                case POLYGON:
+                    //把所有的graphic保存起来，用于之后的高亮
+                    mPolygonMap.put(mark.getId(), graphicId);
+                    mPolygonGraphicToListMap.put(graphicId, i);
+                    break;
+            }
+            //将graphicId和标注保存起来
+            mGraphicToMarkMap.put(graphicId, mark);
+        }
+
+    }
+
+    private void initGLForDrawAllMarks() {
+        if (mainGraphic == null) {
+            mainGraphic = new GraphicsLayer();
+            mMapView.addLayer(mainGraphic);
+            mainGraphic.setSelectionColor(Color.BLUE);
+            mainGraphic.setSelectionColorWidth(3);
+        }
+    }
+
+    private void removeAllMarksOnMap() {
+        mainGraphic.clearSelection();
+        mainGraphic.removeAll();
+    }
+
+    private int drawSingleMark(Mark mark) {
+        Graphic graphic = new Graphic(mark.getGeometry(), mark.getSymbol());
+        int id = mainGraphic.addGraphic(graphic);
+        //进行判断，如果id == -1，表示添加失败
+        return id;
     }
 }

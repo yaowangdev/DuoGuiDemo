@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.appdev.duoguidemo.R;
 import com.appdev.duoguidemo.adapter.MarkAdapter;
@@ -25,6 +26,7 @@ public class MarkListDialog extends DialogFragment {
     private RecyclerView recyclerView;
     private MarkAdapter markAdapter;
     private List<Mark> marks;
+    private TextView tvNoData;
 
 
 
@@ -48,6 +50,7 @@ public class MarkListDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_mark_list,null);
+        tvNoData= view.findViewById(R.id.tv_no_data);
         return view;
     }
 
@@ -58,6 +61,14 @@ public class MarkListDialog extends DialogFragment {
         markAdapter = new MarkAdapter(getActivity(),marks);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(markAdapter);
+        if(marks!=null && marks.size()>0){
+            recyclerView.setVisibility(View.VISIBLE);
+            tvNoData.setVisibility(View.GONE);
+        }else {
+            recyclerView.setVisibility(View.GONE);
+            tvNoData.setVisibility(View.VISIBLE);
+        }
+
     }
 
 
