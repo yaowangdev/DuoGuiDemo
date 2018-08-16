@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.appdev.duoguidemo.R;
 import com.appdev.duoguidemo.adapter.MarkAdapter;
 import com.appdev.duoguidemo.entity.Mark;
+import com.appdev.duoguidemo.listener.OnMarkListClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,12 @@ public class MarkListDialog extends DialogFragment {
     private MarkAdapter markAdapter;
     private List<Mark> marks;
     private TextView tvNoData;
+
+    private OnMarkListClickListener onMarkListClickListener;
+
+    public void setOnMarkListClickListener(OnMarkListClickListener onMarkListClickListener){
+        this.onMarkListClickListener= onMarkListClickListener;
+    }
 
 
 
@@ -59,6 +66,7 @@ public class MarkListDialog extends DialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.mark_recyclerview);
         markAdapter = new MarkAdapter(getActivity(),marks);
+        markAdapter.setOnItemListener(onMarkListClickListener);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(markAdapter);
         if(marks!=null && marks.size()>0){

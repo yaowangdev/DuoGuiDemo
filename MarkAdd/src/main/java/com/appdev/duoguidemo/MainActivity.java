@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
+import com.appdev.duoguidemo.adapter.MarkAdapter;
 import com.appdev.duoguidemo.common.Constants;
 import com.appdev.duoguidemo.entity.EditMode;
 import com.appdev.duoguidemo.entity.Mark;
@@ -24,14 +25,19 @@ import com.appdev.duoguidemo.fragment.MarkListDialog;
 import com.appdev.duoguidemo.fragment.PointDialog;
 import com.appdev.duoguidemo.fragment.PolygonDialog;
 import com.appdev.duoguidemo.listener.MapOperationListener;
+import com.appdev.duoguidemo.listener.OnMarkListClickListener;
 import com.appdev.duoguidemo.presenter.IMarkPresenter;
 import com.appdev.duoguidemo.presenter.impl.MarkPresenterImpl;
 import com.appdev.duoguidemo.util.MarkUtil;
+import com.appdev.duoguidemo.util.ZoomUtil;
 import com.appdev.duoguidemo.view.IMarkView;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.Layer;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
+import com.esri.core.geometry.Envelope;
+import com.esri.core.geometry.Geometry;
+import com.esri.core.geometry.Point;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.FillSymbol;
 import com.esri.core.symbol.LineSymbol;
@@ -55,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private IMarkPresenter iMarkPresenter;
 
     private GraphicsLayer mainGraphic;
+
 
     //用于当用户点击标注列表后高亮标注
     protected Map<Integer, Integer> mPointMap = new ArrayMap<>();//把标注和graphic联系起来的集合，key是标注的id，value是对应graphic的id
@@ -274,6 +281,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void showMarkListDialog(List<Mark> marks) {
         MarkListDialog markListDialog = MarkListDialog.newInstance(marks);
         markListDialog.show(getSupportFragmentManager(),"MarkListDialog");
+        markListDialog.setOnMarkListClickListener(new OnMarkListClickListener() {
+            @Override
+            public void onClick(int position, Mark selectedMark) {
+                //居中到标注
+                Envelope bestZoomExtent = ZoomUtil.getBestZoomExtent(selectedMark.getGeometry(), mMapView.getSpatialReference());
+                mMapView.setExtent(bestZoomExtent);
+                //当点击后，弹出popup，点击popup中的按钮进入编辑状态
+                int markId = selectedMark.getId();
+                int graphicId = getGraphicId(selectedMark.getGeometry(), markId);
+                int[] ids = new int[]{graphicId};
+                highligthMark(ids);
+            }
+        });
     }
 
     @Override
@@ -307,6 +327,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mGraphicToMarkMap.put(graphicId, mark);
         }
 
+    }
+
+    protected int getGraphicId(Geometry geometry, int markId) {
+        int graphicId = 0;
+        switch (geometry.getType()) {
+            case POINT:
+                graphicId = mPointMap.get(markId);
+                break;
+            case POLYLINE:
+                graphicId = mLineMap.get(markId);
+                break;
+            case POLYGON:
+                graphicId = mPolygonMap.get(markId);
+                break;
+        }
+        return graphicId;
+    }
+
+    public void highligthMark(int[] graphicId) {
+        mainGraphic.clearSelection();
+        mainGraphic.setSelectedGraphics(graphicId, true);
     }
 
     private void initGLForDrawAllMarks() {
