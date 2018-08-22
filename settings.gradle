@@ -1,1 +1,1 @@
-include ':MarkAdd', ':framework'
+include ':MarkAdd', ':framework', ':BookMark'
